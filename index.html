@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#f093fb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>💑 Pareja Conectada</title>
+    <style>
+        /* Ajustes para móvil */
+        html { 
+            font-size: 16px;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+        
+        @media (max-width: 430px) {
+            html { font-size: 16px; }
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body { 
+            height: 100%; 
+            width: 100%; 
+            overflow: hidden; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
+            background: linear-gradient(to bottom, #ffe8b3 0%, #fff5e1 100%);
+            position: fixed;
+            overscroll-behavior: none;
+        }
+        #app-shell { 
+            width: 100%; 
+            height: 100%; 
+            background: transparent; 
+            display: flex; 
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        .app-container { 
+            flex-grow: 1; 
+            overflow-y: auto; 
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+        }
+        
+        /* Login Screen */
+        .login-screen { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .login-logo { font-size: 80px; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .login-title { font-size: 32px; font-weight: 700; color: white; margin-bottom: 10px; text-align: center; }
+        .login-subtitle { font-size: 16px; color: white; opacity: 0.9; margin-bottom: 50px; text-align: center; }
+        .profile-selector { display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 350px; }
+        .profile-card { background: white; border-radius: 25px; padding: 30px; display: flex; flex-direction: column; align-items: center; gap: 15px; cursor: pointer; transition: all 0.3s; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
+        .profile-card:active { transform: scale(0.95); }
+        .profile-avatar { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 45px; border: 4px solid #f5f3ff; }
+        .profile-avatar.sol { background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%); }
+        .profile-avatar.luciana { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); }
+        .profile-name { font-size: 24px; font-weight: 700; color: #2d3436; }
+        .profile-role { font-size: 14px; color: #666; }
+        
+        /* Header con degradado rosa */
+        .header { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 30px 20px; border-radius: 0 0 30px 30px; box-shadow: 0 5px 20px rgba(240, 147, 251, 0.3); position: relative; }
+        .logout-btn { position: absolute; top: 35px; right: 20px; background: rgba(255,255,255,0.3); color: white; border: none; padding: 8px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+        .logout-btn:active { transform: scale(0.95); }
+        .user-greeting { display: flex; justify-content: space-between; align-items: center; color: white; }
+        .greeting-text h1 { font-size: 32px; font-weight: 700; margin-bottom: 5px; }
+        .greeting-text p { font-size: 14px; opacity: 0.95; }
+        .avatar { width: 65px; height: 65px; border-radius: 50%; border: 3px solid white; display: flex; align-items: center; justify-content: center; font-size: 35px; box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
+        .avatar.sol { background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%); }
+        .avatar.luciana { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); }
+        
+        /* Stats */
+        .header-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 20px; }
+        .stat-box { background: white; padding: 20px; border-radius: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
+        .stat-icon { font-size: 32px; margin-bottom: 8px; }
+        .stat-number { font-size: 28px; font-weight: 700; color: #6b46c1; margin: 5px 0; }
+        .stat-text { font-size: 13px; color: #666; font-weight: 500; }
+        
+        /* Partner Card */
+        .partner-section { padding: 0 20px 20px; }
+        .partner-card { background: white; border-radius: 25px; padding: 20px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); display: flex; align-items: flex-start; gap: 15px; position: relative; }
+        .partner-avatar { width: 55px; height: 55px; border-radius: 50%; background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; }
+        .partner-info { flex: 1; }
+        .partner-name { font-size: 22px; font-weight: 700; color: #2d3436; margin-bottom: 5px; }
+        .partner-status { font-size: 13px; color: #666; margin-bottom: 8px; }
+        .partner-quote { font-size: 14px; color: #e17055; font-style: italic; line-height: 1.4; }
+        .heart-bg { position: absolute; right: 15px; top: 15px; font-size: 60px; opacity: 0.15; pointer-events: none; }
+        
+        /* Action Buttons */
+        .action-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 20px 20px; }
+        .action-btn { background: white; border: 3px solid #e0e0e0; border-radius: 20px; padding: 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.3s; }
+        .action-btn:active { transform: scale(0.95); }
+        .action-btn-icon { font-size: 28px; }
+        .action-btn-text { font-size: 16px; font-weight: 700; color: #6b46c1; }
+        
+        /* Weekly Calendar */
+        .calendar-section { padding: 0 20px 20px; }
+        .week-calendar { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
+        .week-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .week-nav { background: #f5f3ff; color: #6b46c1; border: none; padding: 8px 12px; border-radius: 10px; cursor: pointer; font-weight: 600; }
+        .week-title { font-size: 16px; font-weight: 700; color: #2d3436; }
+        .week-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+        .day-cell { text-align: center; padding: 12px 5px; border-radius: 12px; background: #fafafa; position: relative; }
+        .day-cell.has-action { background: linear-gradient(135deg, #fff5f8 0%, #f8f7ff 100%); border: 2px solid #ec77ab; }
+        .day-cell.today { background: linear-gradient(135deg, #ec77ab 0%, #7873f5 100%); color: white; font-weight: 700; }
+        .day-name { font-size: 11px; font-weight: 600; opacity: 0.7; margin-bottom: 5px; }
+        .day-number { font-size: 16px; font-weight: 700; }
+        .day-dot { width: 6px; height: 6px; border-radius: 50%; background: #ec77ab; margin: 4px auto 0; }
+        
+        /* Feed */
+        .feed-title { padding: 0 20px 15px; font-size: 20px; font-weight: 700; color: #2d3436; }
+        .feed-container { padding: 0 20px 100px; }
+        .feed-item { background: white; border-radius: 20px; padding: 20px; padding-top: 50px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); animation: slideIn 0.4s ease-out; position: relative; }
+        .feed-item-actions { position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; z-index: 10; }
+        .feed-action-btn { background: #f5f3ff; border: none; padding: 8px 12px; border-radius: 10px; cursor: pointer; font-size: 18px; transition: all 0.2s; }
+        .feed-action-btn:active { transform: scale(0.9); }
+        .feed-action-btn.edit { color: #6b46c1; }
+        .feed-action-btn.delete { color: #e74c3c; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .feed-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .feed-time { font-size: 14px; color: #666; font-weight: 500; }
+        .feed-badge { background: linear-gradient(135deg, #ec77ab 0%, #7873f5 100%); color: white; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 5px; }
+        .feed-text { font-size: 15px; line-height: 1.6; color: #2d3436; margin-bottom: 15px; }
+        .feed-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 15px; border-top: 1px solid #f0f0f0; }
+        .feed-emotion { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #333; font-weight: 600; }
+        .feed-emotion-dots { display: flex; gap: 4px; }
+        .emotion-dot { width: 8px; height: 8px; border-radius: 50%; background: #e0e0e0; }
+        .emotion-dot.filled { background: linear-gradient(135deg, #ec77ab 0%, #7873f5 100%); }
+        
+        /* Bottom Nav - más grande y táctil */
+        .bottom-nav { 
+            background: white; 
+            padding: 15px 10px 30px; 
+            display: flex; 
+            justify-content: space-around; 
+            border-top: 1px solid #f0f0f0; 
+            z-index: 900;
+            position: relative;
+            min-height: 80px;
+        }
+        .nav-item { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            cursor: pointer; 
+            padding: 10px 20px; 
+            color: #aaa; 
+            transition: all 0.3s; 
+            border-radius: 15px;
+            min-width: 70px;
+        }
+        .nav-item.active { color: #6b46c1; background: #f5f3ff; }
+        .nav-icon { font-size: 28px; margin-bottom: 5px; }
+        .nav-label { font-size: 13px; font-weight: 600; }
+        
+        /* FAB - más grande */
+        .fab { 
+            position: fixed; 
+            bottom: 95px; 
+            right: 20px; 
+            width: 70px; 
+            height: 70px; 
+            background: linear-gradient(135deg, #ec77ab 0%, #7873f5 100%); 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: white; 
+            font-size: 36px; 
+            cursor: pointer; 
+            box-shadow: 0 8px 20px rgba(123, 115, 245, 0.4); 
+            z-index: 1000; 
+            transition: transform 0.3s;
+        }
+        .fab:active { transform: scale(0.9); }
+        
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 2000; align-items: center; justify-content: center; }
+        .modal.active { display: flex; animation: fadeIn 0.3s; }
+        .modal-content { background: white; border-radius: 30px; padding: 30px; width: 92%; max-width: 420px; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-header { text-align: center; margin-bottom: 25px; }
+        .modal-icon { font-size: 36px; margin-bottom: 10px; }
+        .modal-title { font-size: 22px; font-weight: 700; color: #2d3436; }
+        .modal-subtitle { font-size: 14px; color: #666; margin-top: 5px; }
+        
+        /* Form */
+        .form-group { margin-bottom: 25px; }
+        .form-label { display: block; font-size: 15px; font-weight: 700; color: #2d3436; margin-bottom: 12px; }
+        .form-input, .form-textarea { width: 100%; padding: 14px; border: 2px solid #e0e0e0; border-radius: 15px; font-size: 15px; font-family: inherit; transition: border-color 0.3s; background: #fafafa; }
+        .form-input:focus, .form-textarea:focus { outline: none; border-color: #7873f5; background: white; }
+        .form-textarea { min-height: 100px; resize: vertical; }
+        
+        /* Date Selector */
+        .date-selector { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+        .date-option { background: white; border: 2px solid #e0e0e0; border-radius: 15px; padding: 12px 5px; text-align: center; cursor: pointer; transition: all 0.3s; }
+        .date-option:active { transform: scale(0.95); }
+        .date-option.selected { border-color: #ec77ab; background: linear-gradient(135deg, #fff5f8 0%, #f8f7ff 100%); }
+        .date-day { font-size: 11px; font-weight: 600; color: #666; margin-bottom: 5px; }
+        .date-number { font-size: 16px; font-weight: 700; color: #2d3436; }
+        
+        /* Category Pills */
+        .category-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .category-pill { background: white; border: 2px solid #e0e0e0; border-radius: 18px; padding: 15px 10px; text-align: center; cursor: pointer; transition: all 0.3s; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .category-pill:active { transform: scale(0.95); }
+        .category-pill.selected { border-color: #ec77ab; background: linear-gradient(135deg, #fff5f8 0%, #f8f7ff 100%); }
+        .category-pill-icon { font-size: 28px; }
+        .category-pill-text { font-size: 12px; font-weight: 700; color: #2d3436; }
+        
+        /* Slider */
+        .slider-container { position: relative; padding: 10px 0; }
+        .slider-value { text-align: center; font-size: 32px; font-weight: 700; color: #7873f5; margin: 10px 0 20px; }
+        .slider-input { width: 100%; height: 8px; border-radius: 10px; background: #e0e0e0; outline: none; -webkit-appearance: none; }
+        .slider-input::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #ec77ab 0%, #7873f5 100%); cursor: pointer; box-shadow: 0 2px 8px rgba(123, 115, 245, 0.4); }
+        .slider-input::-moz-range-thumb { width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #ec77ab 0%, #7873f5 100%); cursor: pointer; border: none; box-shadow: 0 2px 8px rgba(123, 115, 245, 0.4); }
+        
+        /* Emoji Grid */
+        .emoji-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .emoji-option { font-size: 36px; cursor: pointer; text-align: center; padding: 12px; border-radius: 15px; transition: all 0.2s; background: #fafafa; }
+        .emoji-option:active { transform: scale(0.9); }
+        .emoji-option.selected { background: linear-gradient(135deg, #fff5f8 0%, #f8f7ff 100%); transform: scale(1.1); }
+        
+        /* Buttons */
+        .form-actions { display: flex; gap: 12px; margin-top: 30px; }
+        .btn { flex: 1; padding: 16px; border: none; border-radius: 18px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s; }
+        .btn:active { transform: scale(0.95); }
+        .btn-primary { background: linear-gradient(135deg, #ec77ab 0%, #7873f5 100%); color: white; box-shadow: 0 4px 12px rgba(123, 115, 245, 0.3); }
+        .btn-secondary { background: #f0f0f0; color: #666; }
+        
+        /* Notification */
+        .notification { position: fixed; top: 50px; left: 50%; transform: translateX(-50%) translateY(-20px); background: linear-gradient(135deg, #00b894 0%, #00cec9 100%); color: white; padding: 16px 28px; border-radius: 50px; box-shadow: 0 5px 20px rgba(0,184,148,0.4); z-index: 3000; opacity: 0; transition: all 0.5s; pointer-events: none; font-weight: 700; font-size: 15px; }
+        .notification.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .notification.error { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); }
+        
+        /* Empty State */
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-icon { font-size: 80px; margin-bottom: 20px; }
+        .empty-text { font-size: 18px; color: #666; font-weight: 600; margin-bottom: 8px; }
+        .empty-subtext { font-size: 14px; color: #999; }
+        
+        /* Loading */
+        .loading { padding-top: 50%; text-align: center; color: #666; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <div id="app-shell">
+        <div class="app-container"></div>
+        <div class="bottom-nav" style="display: none;">
+            <div class="nav-item active" data-page="inicio">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Inicio</span>
+            </div>
+            <div class="nav-item" data-page="calendario">
+                <span class="nav-icon">📅</span>
+                <span class="nav-label">Calendario</span>
+            </div>
+            <div class="nav-item" data-page="progreso">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">Progreso</span>
+            </div>
+        </div>
+        <div class="fab" style="display: none;" onclick="showModal()">✨</div>
+    </div>
+    <div class="modal" id="modal"></div>
+    <div class="notification" id="notification"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/he/1.2.0/he.min.js"></script>
+    <script>
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzV_gn_yjR3D_9wKUWh8dIUBBwblMMFNnu_kV132kmxq0urS9FlKCaRqCuN16kYG0zMEw/exec';
+        
+        const appContainer = document.querySelector('.app-container');
+        const modalEl = document.getElementById('modal');
+        const notificationEl = document.getElementById('notification');
+        const bottomNav = document.querySelector('.bottom-nav');
+        const fab = document.querySelector('.fab');
+        
+        let appData = [];
+        let currentPage = 'inicio';
+        let selectedCategory = 'Comunicación';
+        let selectedEmoji = '🥰';
+        let intensityValue = 5;
+        let selectedDate = new Date();
+        let currentWeekStart = getWeekStart(new Date());
+        let modalWeekStart = getWeekStart(new Date());
+        let editingItemIndex = null;
+        let editingItemRow = null;
+        
+        // Usuario actual
+        let currentUser = localStorage.getItem('currentUser') || null;
+        
+        const users = {
+            sol: {
+                name: 'Sol',
+                email: 'sol@email.com',
+                emoji: '☀️',
+                partner: 'Luciana',
+                partnerEmoji: '👩',
+                cssClass: 'sol'
+            },
+            luciana: {
+                name: 'Luciana',
+                email: 'luciana@email.com',
+                emoji: '👩',
+                partner: 'Sol',
+                partnerEmoji: '☀️',
+                cssClass: 'luciana'
+            }
+        };
+
+        function getWeekStart(date) {
+            const d = new Date(date);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+            return new Date(d.setDate(diff));
+        }
+
+        function getWeekDates(startDate) {
+            const dates = [];
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(startDate);
+                date.setDate(startDate.getDate() + i);
+                dates.push(date);
+            }
+            return dates;
+        }
+
+        function showNotification(message, isSuccess = true) {
+            notificationEl.textContent = message;
+            notificationEl.className = 'notification' + (isSuccess ? '' : ' error');
+            notificationEl.classList.add('show');
+            setTimeout(() => notificationEl.classList.remove('show'), 3000);
+        }
+
+        function showLoginScreen() {
+            bottomNav.style.display = 'none';
+            fab.style.display = 'none';
+            
+            appContainer.innerHTML = `
+                <div class="login-screen">
+                    <div class="login-logo">💑</div>
+                    <div class="login-title">Pareja Conectada</div>
+                    <div class="login-subtitle">¿Quién está usando la app?</div>
+                    
+                    <div class="profile-selector">
+                        <div class="profile-card" onclick="login('sol')">
+                            <div class="profile-avatar sol">☀️</div>
+                            <div class="profile-name">Sol</div>
+                            <div class="profile-role">Iniciar sesión</div>
+                        </div>
+                        
+                        <div class="profile-card" onclick="login('luciana')">
+                            <div class="profile-avatar luciana">👩</div>
+                            <div class="profile-name">Luciana</div>
+                            <div class="profile-role">Iniciar sesión</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.login = (userId) => {
+            currentUser = userId;
+            localStorage.setItem('currentUser', userId);
+            bottomNav.style.display = 'flex';
+            fab.style.display = 'flex';
+            loadData();
+            showNotification(`¡Hola ${users[userId].name}! 💜`, true);
+        };
+
+        window.logout = () => {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            showLoginScreen();
+            showNotification('Sesión cerrada', true);
+        };
+
+        function formatDate(dateString) {
+            if (!dateString) return 'Hoy';
+            const date = new Date(dateString);
+            const today = new Date();
+            
+            // Normalizar fechas
+            const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            
+            const yesterday = new Date(todayOnly);
+            yesterday.setDate(yesterday.getDate() - 1);
+            
+            if (dateOnly.getTime() === todayOnly.getTime()) return 'Hoy';
+            if (dateOnly.getTime() === yesterday.getTime()) return 'Ayer';
+            
+            // Si es de esta semana
+            const diffDays = Math.floor((todayOnly - dateOnly) / (1000 * 60 * 60 * 24));
+            if (diffDays >= 0 && diffDays < 7) {
+                return date.toLocaleDateString('es-PE', { weekday: 'long' });
+            }
+            
+            return date.toLocaleDateString('es-PE', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        function formatTime(dateString) {
+            if (!dateString) return '10:30';
+            const date = new Date(dateString);
+            return date.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function getCategoryIcon(category) {
+            const icons = {
+                'Comunicación': '💬',
+                'Romanticismo': '💕',
+                'Apoyo': '🤝',
+                'Diversión': '🎉',
+                'Intimidad': '🔥',
+                'Cuidado': '🥰'
+            };
+            return icons[category] || '💕';
+        }
+
+        function renderHomePage(data) {
+            if (!currentUser) { showLoginScreen(); return; }
+            
+            const user = users[currentUser];
+            const myData = data.filter(item => item.QuienRegistra === user.email);
+            const partnerData = data.filter(item => item.QuienRegistra !== user.email);
+            const registrosCount = myData.length;
+            const lastPartnerItem = partnerData.length > 0 ? partnerData[0] : null;
+            const lastAction = lastPartnerItem ? (lastPartnerItem['Descripción'] || lastPartnerItem.descripcion || 'Sin descripción') : 'Aún no hay acciones.';
+            
+            appContainer.innerHTML = `
+                <div class="header">
+                    <button class="logout-btn" onclick="logout()">Cerrar sesión</button>
+                    <div class="user-greeting">
+                        <div class="greeting-text">
+                            <h1>Hola, ${user.name} 💜</h1>
+                            <p>${new Date().toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+                        </div>
+                        <div class="avatar ${user.cssClass}">${user.emoji}</div>
+                    </div>
+                </div>
+                
+                <div class="header-stats">
+                    <div class="stat-box">
+                        <div class="stat-icon">📝</div>
+                        <div class="stat-number">${registrosCount}</div>
+                        <div class="stat-text">Mis registros</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon">🔥</div>
+                        <div class="stat-number">${Math.min(registrosCount, 7)}</div>
+                        <div class="stat-text">Días racha</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon">⭐</div>
+                        <div class="stat-number">${registrosCount >= 10 ? 'Oro' : registrosCount >= 5 ? 'Plata' : 'Bronce'}</div>
+                        <div class="stat-text">Tu nivel</div>
+                    </div>
+                </div>
+                
+                <div class="partner-section">
+                    <div class="partner-card">
+                        <div class="heart-bg">💕</div>
+                        <div class="partner-avatar">${user.partnerEmoji}</div>
+                        <div class="partner-info">
+                            <div class="partner-name">${user.partner}</div>
+                            <div class="partner-status">En línea • Estado: 😊</div>
+                            <div class="partner-quote">"${lastAction.substring(0, 60)}${lastAction.length > 60 ? '...' : ''}"</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-grid">
+                    <div class="action-btn" onclick="showModal()">
+                        <div class="action-btn-icon">✨</div>
+                        <div class="action-btn-text">Registrar</div>
+                    </div>
+                    <div class="action-btn" onclick="switchPage('calendario')">
+                        <div class="action-btn-icon">💞</div>
+                        <div class="action-btn-text">Ver sus<br>notas</div>
+                    </div>
+                    <div class="action-btn" onclick="switchPage('calendario')">
+                        <div class="action-btn-icon">📅</div>
+                        <div class="action-btn-text">Calendario</div>
+                    </div>
+                    <div class="action-btn" onclick="switchPage('progreso')">
+                        <div class="action-btn-icon">📊</div>
+                        <div class="action-btn-text">Progreso</div>
+                    </div>
+                </div>
+                
+                <div class="feed-title">Lo que ${user.partner} registró sobre ti 💝</div>
+                <div class="feed-container">
+                    ${partnerData.length > 0 ? partnerData.map(item => {
+                        const desc = item['Descripción'] || item.descripcion || 'Sin descripción';
+                        const fecha = item.Fecha || item.fecha || new Date().toISOString();
+                        const cat = item.Categoria || item.categoria || 'Cuidado';
+                        const emoji = item.EmocionEmoji || item.emocion || '😊';
+                        const intensidad = parseInt(item.Intensidad || item.intensidad || '5');
+                        
+                        return `
+                            <div class="feed-item">
+                                <div class="feed-item-header">
+                                    <div class="feed-time">${formatDate(fecha)}, ${formatTime(fecha)}</div>
+                                    <div class="feed-badge">${getCategoryIcon(cat)} ${cat}</div>
+                                </div>
+                                <div class="feed-text">${desc}</div>
+                                <div class="feed-footer">
+                                    <div class="feed-emotion">
+                                        <span>Se sintió: ${emoji} Amad${currentUser === 'luciana' ? 'a' : 'o'}</span>
+                                        <div class="feed-emotion-dots">
+                                            ${Array(10).fill(0).map((_, i) => `<div class="emotion-dot ${i < intensidad ? 'filled' : ''}"></div>`).join('')}
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 15px;">
+                                        <span style="font-size: 24px;">❤️</span>
+                                        <span style="font-size: 20px; color: #ccc;">💬</span>
+                                    </div>
+                                </div>
+                            </div>`;
+                    }).join('') : `
+                        <div class="empty-state">
+                            <div class="empty-icon">💝</div>
+                            <div class="empty-text">${user.partner} aún no ha registrado nada sobre ti</div>
+                            <div class="empty-subtext">Cuando lo haga, aparecerá aquí</div>
+                        </div>`
+                    }
+                    
+                    <div class="feed-title" style="margin-top: 30px;">Mis registros sobre ${user.partner} ✨</div>
+                    ${myData.length > 0 ? myData.map((item, idx) => {
+                        const desc = item['Descripción'] || item.descripcion || 'Sin descripción';
+                        const fecha = item.Fecha || item.fecha || new Date().toISOString();
+                        const cat = item.Categoria || item.categoria || 'Cuidado';
+                        const emoji = item.EmocionEmoji || item.emocion || '😊';
+                        const intensidad = parseInt(item.Intensidad || item.intensidad || '5');
+                        
+                        return `
+                            <div class="feed-item">
+                                <div class="feed-item-actions">
+                                    <button class="feed-action-btn edit" onclick="editItemByIndex(${idx})" title="Editar">✏️</button>
+                                    <button class="feed-action-btn delete" onclick="deleteItemByIndex(${idx})" title="Eliminar">🗑️</button>
+                                </div>
+                                <div class="feed-item-header">
+                                    <div class="feed-time">${formatDate(fecha)}, ${formatTime(fecha)}</div>
+                                    <div class="feed-badge">${getCategoryIcon(cat)} ${cat}</div>
+                                </div>
+                                <div class="feed-text">${desc}</div>
+                                <div class="feed-footer">
+                                    <div class="feed-emotion">
+                                        <span>Me sentí: ${emoji} Amad${currentUser === 'sol' ? 'o' : 'a'}</span>
+                                        <div class="feed-emotion-dots">
+                                            ${Array(10).fill(0).map((_, i) => `<div class="emotion-dot ${i < intensidad ? 'filled' : ''}"></div>`).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
+                    }).join('') : `
+                        <div class="empty-state">
+                            <div class="empty-icon">✨</div>
+                            <div class="empty-text">Aún no has registrado nada</div>
+                            <div class="empty-subtext">Toca el botón ✨ para comenzar</div>
+                        </div>`
+                    }
+                </div>
+            `;
+        }
+
+        function renderCalendarioPage(data) {
+            if (!currentUser) { showLoginScreen(); return; }
+            
+            const user = users[currentUser];
+            const myData = data.filter(item => item.QuienRegistra === user.email);
+            const weekDates = getWeekDates(currentWeekStart);
+            const today = new Date();
+            const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            
+            const actionsMap = {};
+            myData.forEach(item => {
+                const itemDate = new Date(item.Fecha || item.fecha);
+                const dateOnly = new Date(itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate());
+                const dateStr = dateOnly.toDateString();
+                actionsMap[dateStr] = (actionsMap[dateStr] || 0) + 1;
+            });
+            
+            const weekStart = weekDates[0];
+            const weekEnd = weekDates[6];
+            const weekTitle = `${weekStart.getDate()} - ${weekEnd.getDate()} ${weekEnd.toLocaleDateString('es-PE', { month: 'long' })}`;
+            
+            appContainer.innerHTML = `
+                <div style="padding: 40px 20px 100px;">
+                    <h1 style="font-size: 28px; font-weight: 700; color: #2d3436; margin-bottom: 10px;">Calendario Semanal 📅</h1>
+                    <p style="font-size: 14px; color: #666; margin-bottom: 30px;">Tus registros sobre ${user.partner}</p>
+                    
+                    <div class="calendar-section">
+                        <div class="week-calendar">
+                            <div class="week-header">
+                                <button class="week-nav" onclick="changeWeek(-1)">← Anterior</button>
+                                <div class="week-title">${weekTitle}</div>
+                                <button class="week-nav" onclick="changeWeek(1)">Siguiente →</button>
+                            </div>
+                            <div class="week-days">
+                                ${weekDates.map(date => {
+                                    const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+                                    const isToday = dateOnly.getTime() === todayOnly.getTime();
+                                    const hasAction = actionsMap[dateOnly.toDateString()] > 0;
+                                    const dayName = date.toLocaleDateString('es-PE', { weekday: 'short' });
+                                    
+                                    return `
+                                        <div class="day-cell ${isToday ? 'today' : ''} ${hasAction ? 'has-action' : ''}">
+                                            <div class="day-name">${dayName}</div>
+                                            <div class="day-number">${date.getDate()}</div>
+                                            ${hasAction ? '<div class="day-dot"></div>' : ''}
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="feed-title" style="margin-top: 20px;">Mis registros de esta semana 💝</div>
+                    <div class="feed-container">
+                        ${myData.filter(item => {
+                            const itemDate = new Date(item.Fecha || item.fecha);
+                            const dateOnly = new Date(itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate());
+                            const weekStart = new Date(weekDates[0].getFullYear(), weekDates[0].getMonth(), weekDates[0].getDate());
+                            const weekEnd = new Date(weekDates[6].getFullYear(), weekDates[6].getMonth(), weekDates[6].getDate());
+                            weekEnd.setHours(23, 59, 59, 999);
+                            return dateOnly >= weekStart && dateOnly <= weekEnd;
+                        }).map((item, idx) => {
+                            const desc = item['Descripción'] || item.descripcion || 'Sin descripción';
+                            const fecha = item.Fecha || item.fecha || new Date().toISOString();
+                            const cat = item.Categoria || item.categoria || 'Cuidado';
+                            const emoji = item.EmocionEmoji || item.emocion || '😊';
+                            const intensidad = parseInt(item.Intensidad || item.intensidad || '5');
+                            
+                            // Encontrar el índice real en myData
+                            const realIdx = myData.findIndex(i => i === item);
+                            
+                            return `
+                                <div class="feed-item">
+                                    <div class="feed-item-actions">
+                                        <button class="feed-action-btn edit" onclick="editItemByIndex(${realIdx})" title="Editar">✏️</button>
+                                        <button class="feed-action-btn delete" onclick="deleteItemByIndex(${realIdx})" title="Eliminar">🗑️</button>
+                                    </div>
+                                    <div class="feed-item-header">
+                                        <div class="feed-time">${formatDate(fecha)}, ${formatTime(fecha)}</div>
+                                        <div class="feed-badge">${getCategoryIcon(cat)} ${cat}</div>
+                                    </div>
+                                    <div class="feed-text">${desc}</div>
+                                    <div class="feed-footer">
+                                        <div class="feed-emotion">
+                                            <span>${emoji} ${intensidad}/10</span>
+                                        </div>
+                                    </div>
+                                </div>`;
+                        }).join('') || '<div class="empty-state"><div class="empty-icon">📅</div><div class="empty-text">No hay registros esta semana</div></div>'}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderProgressPage(data) {
+            if (!currentUser) { showLoginScreen(); return; }
+            
+            const user = users[currentUser];
+            const myData = data.filter(item => item.QuienRegistra === user.email);
+            const registrosCount = myData.length;
+            const categories = {};
+            
+            myData.forEach(item => {
+                const cat = item.Categoria || item.categoria || 'General';
+                categories[cat] = (categories[cat] || 0) + 1;
+            });
+
+            appContainer.innerHTML = `
+                <div style="padding: 40px 20px 100px;">
+                    <h1 style="font-size: 28px; font-weight: 700; color: #2d3436; margin-bottom: 10px;">Tu Progreso 📊</h1>
+                    <p style="font-size: 14px; color: #666; margin-bottom: 30px;">Tus registros sobre ${user.partner}</p>
+                    
+                    <div class="stat-box" style="margin-bottom: 20px;">
+                        <div class="stat-icon">💝</div>
+                        <div class="stat-number" style="font-size: 48px;">${registrosCount}</div>
+                        <div class="stat-text" style="font-size: 16px;">Momentos especiales registrados</div>
+                    </div>
+                    
+                    <div class="partner-card" style="margin-bottom: 20px;">
+                        <div style="width: 100%;">
+                            <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 15px;">Por categoría</h3>
+                            ${Object.keys(categories).length > 0 ? 
+                                Object.entries(categories).map(([cat, count]) => `
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0;">
+                                        <span style="font-size: 15px; color: #2d3436;">${getCategoryIcon(cat)} ${cat}</span>
+                                        <span style="font-weight: 700; color: #7873f5; font-size: 18px;">${count}</span>
+                                    </div>
+                                `).join('') : 
+                                '<p style="text-align: center; color: #999; padding: 20px;">No hay datos aún</p>'
+                            }
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function loadData() {
+            if (!currentUser) { showLoginScreen(); return; }
+            
+            appContainer.innerHTML = '<div class="loading">Cargando momentos especiales...</div>';
+            
+            try {
+                const response = await fetch(APPS_SCRIPT_URL);
+                if (!response.ok) throw new Error(`Error ${response.status}`);
+                
+                const result = await response.json();
+                
+                if (result.result === "success" && Array.isArray(result.data)) {
+                    appData = result.data;
+                } else if (Array.isArray(result)) {
+                    appData = result;
+                } else {
+                    throw new Error('Formato de respuesta inesperado');
+                }
+                
+                renderCurrentPage();
+            } catch (error) {
+                console.error('Error al cargar:', error);
+                showNotification(`⚠️ ${error.message}`, false);
+                appData = [];
+                renderCurrentPage();
+            }
+        }
+
+        function renderCurrentPage() {
+            switch(currentPage) {
+                case 'inicio':
+                    renderHomePage(appData);
+                    break;
+                case 'calendario':
+                    renderCalendarioPage(appData);
+                    break;
+                case 'progreso':
+                    renderProgressPage(appData);
+                    break;
+            }
+        }
+
+        window.changeWeek = (direction) => {
+            currentWeekStart.setDate(currentWeekStart.getDate() + (direction * 7));
+            renderCurrentPage();
+        };
+
+        window.editItemByIndex = (idx) => {
+            const user = users[currentUser];
+            const myData = appData.filter(item => item.QuienRegistra === user.email);
+            const item = myData[idx];
+            
+            if (!item) {
+                showNotification('❌ No se encontró el registro', false);
+                return;
+            }
+            
+            // Calcular rowIndex: posición en appData inversa + 2 (por header)
+            const fullDataIndex = appData.indexOf(item);
+            editingItemRow = appData.length - fullDataIndex + 1;
+            editingItemIndex = idx;
+            
+            selectedCategory = item.Categoria || item.categoria || 'Comunicación';
+            selectedEmoji = item.EmocionEmoji || item.emocion || '🥰';
+            intensityValue = parseInt(item.Intensidad || item.intensidad || '5');
+            selectedDate = new Date(item.Fecha || item.fecha);
+            modalWeekStart = getWeekStart(selectedDate);
+            
+            renderModalContent(item['Descripción'] || item.descripcion);
+        };
+
+        window.deleteItemByIndex = async (idx) => {
+            const user = users[currentUser];
+            const myData = appData.filter(item => item.QuienRegistra === user.email);
+            const item = myData[idx];
+            
+            if (!item) {
+                showNotification('❌ No se encontró el registro', false);
+                return;
+            }
+            
+            const confirmDelete = confirm('¿Estás seguro de que quieres eliminar este momento?');
+            if (!confirmDelete) return;
+            
+            const fullDataIndex = appData.indexOf(item);
+            const rowIndex = appData.length - fullDataIndex + 1;
+            
+            try {
+                await fetch(`${APPS_SCRIPT_URL}?action=delete&row=${rowIndex}`);
+                showNotification('🗑️ Momento eliminado', true);
+                setTimeout(() => loadData(), 1000);
+            } catch (error) {
+                console.error("Error al eliminar:", error);
+                showNotification(`❌ Error al eliminar`, false);
+            }
+        };
+
+        window.showModal = () => {
+            if (!currentUser) return;
+            
+            editingItemIndex = null;
+            editingItemRow = null;
+            selectedCategory = 'Comunicación';
+            selectedEmoji = '🥰';
+            intensityValue = 5;
+            selectedDate = new Date();
+            modalWeekStart = getWeekStart(new Date());
+            
+            renderModalContent();
+        };
+
+        function renderModalContent(descripcionValue = '') {
+            const user = users[currentUser];
+            const weekDates = getWeekDates(modalWeekStart);
+            
+            const weekStart = weekDates[0];
+            const weekEnd = weekDates[6];
+            const weekTitle = `${weekStart.getDate()} - ${weekEnd.getDate()} ${weekEnd.toLocaleDateString('es-PE', { month: 'short' })}`;
+            
+            const isEditing = editingItemIndex !== null;
+            
+            modalEl.innerHTML = `
+                <div class="modal-content">
+                    <form id="data-form">
+                        <div class="modal-header">
+                            <div class="modal-icon">${isEditing ? '✏️' : '💝'}</div>
+                            <div class="modal-title">${isEditing ? 'Editar' : 'Registrar'} momento especial</div>
+                            <div class="modal-subtitle">¿Qué hizo ${user.partner} que te gustó?</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">¿Qué día fue este momento?</label>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <button type="button" class="week-nav" onclick="changeModalWeek(-1)">← Anterior</button>
+                                <span style="font-size: 13px; font-weight: 600; color: #666;">${weekTitle}</span>
+                                <button type="button" class="week-nav" onclick="changeModalWeek(1)">Siguiente →</button>
+                            </div>
+                            <div class="date-selector">
+                                ${weekDates.map(date => {
+                                    const isSelected = date.toDateString() === selectedDate.toDateString();
+                                    const dayName = date.toLocaleDateString('es-PE', { weekday: 'short' });
+                                    const dayNumber = date.getDate();
+                                    
+                                    return `
+                                        <div class="date-option ${isSelected ? 'selected' : ''}" onclick="selectDate(this, '${date.toISOString()}')">
+                                            <div class="date-day">${dayName}</div>
+                                            <div class="date-number">${dayNumber}</div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Describe ese momento especial</label>
+                            <textarea class="form-textarea" name="descripcion" placeholder="Escribe aquí lo que hizo tu pareja..." required>${descripcionValue}</textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">¿En qué categoría lo clasificarías?</label>
+                            <div class="category-grid">
+                                ${['Comunicación', 'Romanticismo', 'Apoyo', 'Diversión', 'Intimidad', 'Cuidado'].map(cat => `
+                                    <div class="category-pill ${selectedCategory === cat ? 'selected' : ''}" onclick="selectCategory(this, '${cat}')">
+                                        <div class="category-pill-icon">${getCategoryIcon(cat)}</div>
+                                        <div class="category-pill-text">${cat}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">¿Cómo te hizo sentir? (1-10)</label>
+                            <div class="slider-container">
+                                <div class="slider-value" id="intensity-display">${intensityValue} / 10</div>
+                                <input type="range" class="slider-input" name="intensidad" min="1" max="10" value="${intensityValue}" oninput="updateIntensity(this.value)">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Elige un emoji que represente tu emoción</label>
+                            <div class="emoji-grid">
+                                ${['🥰', '😊', '😌', '🤗', '😍', '🥺', '😇', '🤩'].map(emoji => `
+                                    <div class="emoji-option ${selectedEmoji === emoji ? 'selected' : ''}" onclick="selectEmoji(this, '${emoji}')">${emoji}</div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="hideModal()">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">${isEditing ? '✏️ Actualizar' : '💝 Guardar momento'}</button>
+                        </div>
+                    </form>
+                </div>`;
+            modalEl.classList.add('active');
+            
+            document.getElementById('data-form').addEventListener('submit', saveAction);
+        }
+
+        window.changeModalWeek = (direction) => {
+            modalWeekStart.setDate(modalWeekStart.getDate() + (direction * 7));
+            const desc = document.querySelector('[name="descripcion"]')?.value || '';
+            renderModalContent(desc);
+        };
+
+        window.hideModal = () => {
+            modalEl.classList.remove('active');
+        };
+
+        window.selectDate = (element, dateStr) => {
+            selectedDate = new Date(dateStr);
+            document.querySelectorAll('.date-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+        };
+
+        window.selectCategory = (element, category) => {
+            selectedCategory = category;
+            document.querySelectorAll('.category-pill').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+        };
+
+        window.selectEmoji = (element, emoji) => {
+            selectedEmoji = emoji;
+            document.querySelectorAll('.emoji-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+        };
+
+        window.updateIntensity = (value) => {
+            intensityValue = value;
+            document.getElementById('intensity-display').textContent = `${value} / 10`;
+        };
+
+        window.switchPage = (page) => {
+            currentPage = page;
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.querySelector(`[data-page="${page}"]`).classList.add('active');
+            renderCurrentPage();
+        };
+
+        async function saveAction(event) {
+            event.preventDefault();
+            if (!currentUser) return;
+            
+            const user = users[currentUser];
+            const submitButton = event.target.querySelector('.btn-primary');
+            const originalText = submitButton.textContent;
+            submitButton.textContent = '⏳ Guardando...';
+            submitButton.disabled = true;
+
+            const descripcion = event.target.elements.descripcion.value;
+
+            const formData = {
+                quienRegistra: user.email,
+                paraQuien: user.partner,
+                descripcion: descripcion,
+                categoria: selectedCategory,
+                intensidad: intensityValue.toString(),
+                emocion: selectedEmoji,
+                fecha: selectedDate.toISOString()
+            };
+
+            try {
+                let url = APPS_SCRIPT_URL;
+                if (editingItemRow) {
+                    url += `?action=update&row=${editingItemRow}`;
+                }
+                
+                await fetch(url, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                hideModal();
+                showNotification(editingItemRow ? '✏️ ¡Momento actualizado!' : '💝 ¡Momento guardado!', true);
+                setTimeout(() => loadData(), 1500);
+            } catch (error) {
+                console.error("Error:", error);
+                showNotification(`❌ Error: ${error.message}`, false);
+                submitButton.textContent = originalText;
+                submitButton.disabled = false;
+            }
+        }
+
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                currentPage = this.dataset.page;
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                this.classList.add('active');
+                renderCurrentPage();
+            });
+        });
+
+        modalEl.addEventListener('click', function(e) {
+            if (e.target === modalEl) hideModal();
+        });
+
+        if (currentUser) {
+            bottomNav.style.display = 'flex';
+            fab.style.display = 'flex';
+            loadData();
+        } else {
+            showLoginScreen();
+        }
+    </script>
+</body>
+</html>
