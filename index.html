@@ -193,6 +193,28 @@
         .metric-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
         .metric-label { font-size: 14px; color: #666; }
         .metric-value { font-size: 16px; font-weight: 700; color: #667eea; }
+        
+        /* Tabla semanal psicóloga */
+        .week-table-container { overflow-x: auto; margin: 20px 0; }
+        .week-table { width: 100%; border-collapse: collapse; background: white; border-radius: 15px; overflow: hidden; }
+        .week-table th { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 10px; font-size: 13px; font-weight: 700; text-align: center; border-right: 1px solid rgba(255,255,255,0.2); }
+        .week-table th:first-child { text-align: left; padding-left: 20px; min-width: 100px; }
+        .week-table th:last-child { border-right: none; }
+        .week-table td { padding: 15px 10px; text-align: left; border-bottom: 1px solid #f0f0f0; border-right: 1px solid #f0f0f0; font-size: 13px; vertical-align: top; }
+        .week-table td:first-child { font-weight: 700; color: #2d3436; padding-left: 20px; background: #fafafa; min-width: 100px; }
+        .week-table td:last-child { border-right: none; }
+        .week-table tbody tr:last-child td { border-bottom: none; }
+        .week-table .day-header { font-size: 11px; color: #666; display: block; margin-bottom: 3px; text-transform: capitalize; }
+        .week-table .day-date { font-size: 16px; font-weight: 700; color: #2d3436; display: block; }
+        .week-table .registro-item { background: #f8f7ff; padding: 10px; border-radius: 10px; margin-bottom: 8px; border-left: 3px solid #667eea; }
+        .week-table .registro-item:last-child { margin-bottom: 0; }
+        .week-table .registro-time { font-size: 11px; color: #667eea; font-weight: 600; margin-bottom: 5px; }
+        .week-table .registro-cat { font-size: 11px; color: #999; margin-bottom: 5px; }
+        .week-table .registro-text { font-size: 13px; color: #2d3436; line-height: 1.4; margin-bottom: 5px; }
+        .week-table .registro-emotion { font-size: 12px; color: #666; }
+        .week-table .empty-day { color: #ccc; font-style: italic; text-align: center; padding: 20px 5px; }
+        .week-table-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .week-table-title { font-size: 18px; font-weight: 700; color: #2d3436; }
     </style>
 </head>
 <body>
@@ -259,8 +281,8 @@
                 role: 'paciente'
             },
             psicologa: {
-                name: 'Dra. Patricia',
-                email: 'patricia@psicologa.com',
+                name: 'Psicóloga',
+                email: 'psicologa@profesional.com',
                 emoji: '👩‍⚕️',
                 partner: '',
                 partnerEmoji: '',
@@ -318,7 +340,7 @@
                         
                         <div class="profile-card" onclick="login('psicologa')">
                             <div class="profile-avatar psicologa">👩‍⚕️</div>
-                            <div class="profile-name">Dra. Patricia</div>
+                            <div class="profile-name">Psicóloga</div>
                             <div class="profile-role">Vista Profesional</div>
                         </div>
                     </div>
@@ -393,6 +415,29 @@
             const solData = data.filter(item => item.QuienRegistra === 'sol@email.com');
             const lucianaData = data.filter(item => item.QuienRegistra === 'luciana@email.com');
             
+            // Obtener la semana actual
+            const weekDates = getWeekDates(currentWeekStart);
+            const weekStart = weekDates[0];
+            const weekEnd = weekDates[6];
+            const weekTitle = `${weekStart.getDate()} de ${weekStart.toLocaleDateString('es-PE', { month: 'long' })} - ${weekEnd.getDate()} de ${weekEnd.toLocaleDateString('es-PE', { month: 'long', year: 'numeric' })}`;
+            
+            // Crear mapa de registros por día y persona
+            const registrosPorDia = {
+                'sol@email.com': {},
+                'luciana@email.com': {}
+            };
+            
+            data.forEach(item => {
+                const itemDate = new Date(item.Fecha || item.fecha);
+                const dateKey = itemDate.toDateString();
+                const email = item.QuienRegistra;
+                
+                if (!registrosPorDia[email][dateKey]) {
+                    registrosPorDia[email][dateKey] = [];
+                }
+                registrosPorDia[email][dateKey].push(item);
+            });
+            
             const categories = {};
             data.forEach(item => {
                 const cat = item.Categoria || item.categoria || 'General';
@@ -450,8 +495,99 @@
                 
                 <div class="dashboard-grid">
                     <div class="dashboard-card">
+                        <div class="dashboard-card-title">📅 Tabla Semanal de Registros</div>
+                        
+                        <div class="week-table-nav">
+                            <button class="week-nav" onclick="changePsicologaWeek(-1)">← Anterior</button>
+                            <div class="week-table-title">${weekTitle}</div>
+                            <button class="week-nav" onclick="changePsicologaWeek(1)">Siguiente →</button>
+                        </div>
+                        
+                        <div class="week-table-container">
+                            <table class="week-table">
+                                <thead>
+                                    <tr>
+                                        <th>Persona</th>
+                                        ${weekDates.map(date => {
+                                            const dayName = date.toLocaleDateString('es-PE', { weekday: 'short' });
+                                            const dayNum = date.getDate();
+                                            const monthName = date.toLocaleDateString('es-PE', { month: 'short' });
+                                            return `<th>
+                                                <span class="day-header">${dayName.charAt(0).toUpperCase() + dayName.slice(1)}</span>
+                                                <span class="day-date">${dayNum} ${monthName}</span>
+                                            </th>`;
+                                        }).join('')}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>☀️ Sol</td>
+                                        ${weekDates.map(date => {
+                                            const dateKey = date.toDateString();
+                                            const registros = registrosPorDia['sol@email.com'][dateKey] || [];
+                                            
+                                            if (registros.length === 0) {
+                                                return `<td><div class="empty-day">Sin registros</div></td>`;
+                                            }
+                                            
+                                            return `<td>
+                                                ${registros.map(item => {
+                                                    const desc = item['Descripción'] || item.descripcion || 'Sin descripción';
+                                                    const cat = item.Categoria || item.categoria || 'General';
+                                                    const emoji = item.EmocionEmoji || item.emocion || '😊';
+                                                    const intensidad = item.Intensidad || item.intensidad || '5';
+                                                    const hora = formatTime(item.Fecha || item.fecha);
+                                                    
+                                                    return `
+                                                        <div class="registro-item">
+                                                            <div class="registro-time">${hora}</div>
+                                                            <div class="registro-cat">${getCategoryIcon(cat)} ${cat}</div>
+                                                            <div class="registro-text">${desc}</div>
+                                                            <div class="registro-emotion">${emoji} ${intensidad}/10</div>
+                                                        </div>
+                                                    `;
+                                                }).join('')}
+                                            </td>`;
+                                        }).join('')}
+                                    </tr>
+                                    <tr>
+                                        <td>👩 Luciana</td>
+                                        ${weekDates.map(date => {
+                                            const dateKey = date.toDateString();
+                                            const registros = registrosPorDia['luciana@email.com'][dateKey] || [];
+                                            
+                                            if (registros.length === 0) {
+                                                return `<td><div class="empty-day">Sin registros</div></td>`;
+                                            }
+                                            
+                                            return `<td>
+                                                ${registros.map(item => {
+                                                    const desc = item['Descripción'] || item.descripcion || 'Sin descripción';
+                                                    const cat = item.Categoria || item.categoria || 'General';
+                                                    const emoji = item.EmocionEmoji || item.emocion || '😊';
+                                                    const intensidad = item.Intensidad || item.intensidad || '5';
+                                                    const hora = formatTime(item.Fecha || item.fecha);
+                                                    
+                                                    return `
+                                                        <div class="registro-item">
+                                                            <div class="registro-time">${hora}</div>
+                                                            <div class="registro-cat">${getCategoryIcon(cat)} ${cat}</div>
+                                                            <div class="registro-text">${desc}</div>
+                                                            <div class="registro-emotion">${emoji} ${intensidad}/10</div>
+                                                        </div>
+                                                    `;
+                                                }).join('')}
+                                            </td>`;
+                                        }).join('')}
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
                         <div class="dashboard-card-title">📊 Actividad por categoría</div>
-                        ${topCategories.map(([cat, count]) => {
+                        ${topCategories.length > 0 ? topCategories.map(([cat, count]) => {
                             const maxCount = topCategories[0][1];
                             const percentage = (count / maxCount) * 100;
                             return `
@@ -460,7 +596,7 @@
                                     <div class="chart-bar-fill" style="width: ${percentage}%;">${count}</div>
                                 </div>
                             `;
-                        }).join('')}
+                        }).join('') : '<p style="text-align: center; color: #999; padding: 20px;">No hay datos aún</p>'}
                     </div>
                     
                     <div class="dashboard-card">
@@ -870,6 +1006,11 @@
         }
 
         window.changeWeek = (direction) => {
+            currentWeekStart.setDate(currentWeekStart.getDate() + (direction * 7));
+            renderCurrentPage();
+        };
+
+        window.changePsicologaWeek = (direction) => {
             currentWeekStart.setDate(currentWeekStart.getDate() + (direction * 7));
             renderCurrentPage();
         };
